@@ -1,4 +1,4 @@
 /.vscode
-output.png
-output.svg
-/src
+*.svg
+*.mp3
+*.png
