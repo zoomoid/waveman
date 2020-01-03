@@ -2,6 +2,7 @@ import numpy as np
 import librosa
 import svgwrite
 import argparse
+import cairosvg
 
 def max_in_area(y, j, delta):
   max = 0
@@ -18,7 +19,7 @@ def create_buffer(data, delta, steps):
   return samples
 
 def draw(output_file, samples, step_width, step_height, color='black', gap=0):
-  dwg = svgwrite.Drawing(output_file)
+  dwg = svgwrite.Drawing(output_file + '.svg')
   print('Drawing...')
   for i in range(0, len(samples)):
     dwg.add(dwg.rect(
@@ -30,25 +31,35 @@ def draw(output_file, samples, step_width, step_height, color='black', gap=0):
   dwg.save()
   print('Saved SVG.')
 
+  cairosvg.svg2png(
+    url=output_file + '.svg',
+    write_to=output_file + '.png',
+    parent_width=len(samples) * step_width + gap,
+    parent_height=step_height,
+    dpi=600,
+    scale=1
+  )
+  print('Saved PNG.')
+
 def main():
   parser = argparse.ArgumentParser()
-  parser.add_argument('-i', help='Input file path')
+  parser.add_argument('--input', help='Input file path')
   parser.add_argument('--steps', help='The total number of steps done')
   parser.add_argument('--width', help='The total width of the image')
   parser.add_argument('--height', help='The total height of the image')
-  parser.add_argument('-o', help='Output file path')
+  parser.add_argument('--output', help='Output file path')
   args = parser.parse_args()
 
-  if args.i:
-    filename = args.i
+  if args.input:
+    filename = args.input
   else:
     print('No input file provided, using first mp3 found in current folder')
     filename = './*.mp3'
   
-  if args.o:
-    output = args.o
+  if args.output:
+    output = args.output
   else:
-    output = './output.svg'
+    output = './' + filename
 
   if args.steps:
     steps = int(args.steps)
@@ -68,8 +79,8 @@ def main():
     step_height = 128
   
   print('Loading audio file into RAM...')
-  print('Sampling at 44.1 kHz')
-  y, sr = librosa.load(filename, 44100, True)
+  print('Sampling at 48 kHz')
+  y, sr = librosa.load(filename, 48000, True)
   print('Loaded and coverted audio to Mono track')
 
   delta_t = len(y) // steps
