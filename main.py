@@ -63,9 +63,9 @@ def create_buffer(data, delta, steps, mode="avg"):
   samples = []
   log("Creating chunks", steps=steps, mode=mode)
   for j in range(0, steps):
-    if mode is "avg":
+    if mode == "avg":
       samples.append(avg_in_area(data, j, delta))
-    elif mode is "max":
+    elif mode == "max":
       samples.append(max_in_area(data, j, delta))
     else:
       raise "Unsupported mode"
@@ -84,16 +84,24 @@ Draws the transformed sample list to a SVG canvas based on the given arguments
 @param gap spacing between the bars. [Defaults to 1]
 @param rounded radius of rounded borders. Draws only symmetric, i.e., same y-radius as x-radius. [Defaults to 0] 
 """
-def draw(output_file, samples, step_width, step_height, color='white', gap=1, rounded=0):
-  dwg = svgwrite.Drawing(output_file + '.svg')
-  log('Start drawing boxes', boxes=len(samples), color=color, rounded_radius=rounded)
+def draw(output_file, samples, step_width, step_height, color="white", gap=1, rounded=0, align="bottom"):
+  dwg = svgwrite.Drawing(output_file + ".svg")
+  log("Start drawing boxes", boxes=len(samples), color=color, rounded_radius=rounded, align=align, gap=gap)
   for i in range(0, len(samples)):
+    if align == "bottom":
+      pos = (i * (step_width),  (1 - samples[i]) * step_height)
+    elif align == "center":
+      pos =  (i * (step_width), (0.5 * step_height) - (0.5 * samples[i] * step_height))
+    else:
+      log("Found unsupported alignment", align=align)
+      return
+    
     dwg.add(dwg.rect(
-      (i * (step_width) + gap, -0.5 * samples[i] + (0.5 * step_height)), # position
-      (step_width - 0.5*gap, samples[i] * step_height), # size
+      pos, # position
+      (step_width - gap, samples[i] * step_height), # size
       rounded, rounded, # border radius (x, y)
       fill=color)
-    )
+    ) # assuming top-left corner to bottom-right growth
 
   dwg.save()
   log("Saved SVG to file", output=output_file, width=((step_width + gap) * len(samples)), height=step_height)
@@ -101,7 +109,7 @@ def draw(output_file, samples, step_width, step_height, color='white', gap=1, ro
   cairosvg.svg2png(
     url=output_file + '.svg',
     write_to=output_file + '.png',
-    parent_width=len(samples) * (step_width + gap),
+    parent_width=len(samples) * (step_width),
     parent_height=step_height,
     dpi=600,
     scale=1
@@ -113,15 +121,15 @@ def draw(output_file, samples, step_width, step_height, color='white', gap=1, ro
 def main():
   parser = argparse.ArgumentParser()
 
-  parser.add_argument('--input', help='Input file path')
-  parser.add_argument('--steps', help='The total number of steps done')
-  parser.add_argument('--width', help='The total width of the image')
-  parser.add_argument('--height', help='The total height of the image')
-  parser.add_argument('--output', help='Output file path')
-  parser.add_argument('--color', help="The fill color for the bars")
-  parser.add_argument('--rounded', help="Rounded corner radius")
+  parser.add_argument('--input', help='Input file path. Required')
+  parser.add_argument('--steps', help='The total number of steps done. [Default 200]')
+  parser.add_argument('--width', help='The total width of the image. [Default 2000]')
+  parser.add_argument('--height', help='The total height of the image. [Default 128]')
+  parser.add_argument('--output', help='Output file path. [Default $input]')
+  parser.add_argument('--color', help="The fill color for the bars. [Default 'black']")
+  parser.add_argument('--rounded', help="Rounded corner radius. [Default 0]")
   parser.add_argument('--mode', help="Sample visualization mode. Either 'avg' or 'max' [Default 'avg']")
-
+  parser.add_argument('--align', help="Vertical bar alignment. Either 'center' or 'bottom' [Default 'bottom']")
   args = parser.parse_args()
 
   if args.input:
@@ -163,18 +171,28 @@ def main():
     step_height = 128
 
   if args.mode:
-    mode = "avg"
-  else:
-    if args.mode is "avg" or args.mode is "max":
+    if args.mode == "avg" or args.mode == "max":
       mode = args.mode
     else:
+      log("Found unsupported transformation mode. Only supports 'avg' and 'max'", mode=args.mode)
       mode = "avg"
+  else:
+    mode = "avg"
+  
+  if args.align:
+    if args.align == "bottom" or args.align == "center":
+      align = args.align
+    else:
+      log("Found unsupported alignment. Only supports 'center' and 'bottom'", align=args.align)
+      align = "bottom"
+  else:
+    align = "bottom"
   
   start = time.time()
 
   log("Loading audio file into RAM", sampling_rate="48000", mono=True)
 
-  y, sr = librosa.load(filename, 48000, True, )
+  y, sr = librosa.load(filename, 48000, True)
 
   delta_t = len(y) // steps # delta is the ratio of desired steps (hence no. of bars) to the total sample count
   samples = create_buffer(y, delta_t, steps, mode=mode)
@@ -185,7 +203,8 @@ def main():
     step_height=step_height, 
     color=color, 
     gap=x_gap,
-    rounded=rounded
+    rounded=rounded,
+    align=align
   )
 
   end = time.time()
