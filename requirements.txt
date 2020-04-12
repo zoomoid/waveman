@@ -16,7 +16,7 @@ mccabe==0.6.1
 numba==0.46.0
 numpy==1.18.0
 Pillow==7.0.0
-pkg-resources==0.0.0
+# pkg-resources==0.0.0
 pycparser==2.19
 pylint==2.4.4
 pyparsing==2.4.6
