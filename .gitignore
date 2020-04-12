@@ -1,7 +1,5 @@
 /.vscode
-*.svg
 *.mp3
-*.png
 scripts/
 lib/
 lib64
@@ -9,4 +7,3 @@ include/
 pyvenv.cfg
 bin/
 share/
-demo/
