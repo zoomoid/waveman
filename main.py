@@ -1,24 +1,30 @@
-import numpy as np
 import librosa
 import svgwrite
 import argparse
 import cairosvg
+import time
+
+def log(msg, **kwargs):
+  log_obj = {}
+  for key in kwargs:
+    log_obj[key] = kwargs[key]
+  # log_obj['msg'] = msg
+  print(f"{msg} \n\t{log_obj}")
 
 """
 Absolute maximum mode:
 
 For a given range, compute the absolute maximum sample
+NOTE: as we pass the original list of values to the function rather than copying
+only the relevant part, we rely on absolute range limits rather than refactoring this
+outside the function. This also means we cannot simply use max(list) or abs(list)
 @param y - sample array
 @param j - step index: means we compute for the j'th step
 @param delta - range length
 @return maximum absolute sample value
 """
 def max_in_area(y, j, delta):
-  max = 0
-  for i in range(j * delta, (j + 1) * delta):
-    if abs(y[i]) > max:
-      max = abs(y[i])
-  return max
+  return max([abs(y[i]) for i in range(j * delta, (j+1) * delta)])
 
 """
 Average mode:
@@ -30,27 +36,54 @@ For a given range, compute the average sample
 @return average sample value
 """
 def avg_in_area(y, j, delta):
-  acc = 0
-  for i in range(j * delta, (j+1) * delta):
-    acc += abs(y[i])
-  return acc / delta 
+  return sum([abs(y[i]) for i in range(j * delta, (j+1) * delta)]) / delta 
 
+"""
+Normalizes a given list of numbers
 
+@param y - list of numbers
+"""
+def normalize(y):
+  max_val = max([abs(x) for x in y])
+  return list(map(lambda v: v / max_val, y))
+
+"""
+Slices the full samples list into smaller chunks and processes them based on the given mode
+
+@param data full raw sample list
+@param delta ratio of steps to total sample size
+@param steps output chunks
+@param mode string determining the processing mode. Currently supports "avg" and "max"
+@return output chunk samples for drawing onto SVG canvas
+"""
 def create_buffer(data, delta, steps, mode="avg"):
   samples = []
-  for j in range(0, steps - 1):
+  log("Creating chunks", steps=steps, mode=mode)
+  for j in range(0, steps):
     if mode is "avg":
       samples.append(avg_in_area(data, j, delta))
     elif mode is "max":
       samples.append(max_in_area(data, j, delta))
     else:
       raise "Unsupported mode"
-  print('Created sample buffer')
-  return samples
+    
+  log("Finished sample chunk creation", length=len(samples))
+  return normalize(samples)
 
+"""
+Draws the transformed sample list to a SVG canvas based on the given arguments
+
+@param output_file filename for the output svg
+@param samples transformed sample list
+@param step_width horizontal length of bars
+@param step_height vertical length of bars
+@param color fill color for the bars. [Defaults to "white"]
+@param gap spacing between the bars. [Defaults to 1]
+@param rounded radius of rounded borders. Draws only symmetric, i.e., same y-radius as x-radius. [Defaults to 0] 
+"""
 def draw(output_file, samples, step_width, step_height, color='white', gap=1, rounded=0):
   dwg = svgwrite.Drawing(output_file + '.svg')
-  print('Drawing...')
+  log('Start drawing boxes', boxes=len(samples), color=color, rounded_radius=rounded)
   for i in range(0, len(samples)):
     dwg.add(dwg.rect(
       (i * (step_width) + gap, (1 - samples[i]) * step_height), # position
@@ -60,17 +93,18 @@ def draw(output_file, samples, step_width, step_height, color='white', gap=1, ro
     )
 
   dwg.save()
-  print('Saved SVG.')
+  log("Saved SVG to file", output=output_file, width=((step_width + gap) * len(samples)), height=step_height)
 
   cairosvg.svg2png(
     url=output_file + '.svg',
     write_to=output_file + '.png',
-    parent_width=len(samples) * step_width + gap,
+    parent_width=len(samples) * (step_width + gap),
     parent_height=step_height,
     dpi=600,
     scale=1
   )
-  print('Saved PNG.')
+  log("Converted SVG to PNG", output=output_file, width=((step_width + gap) * len(samples)), height=step_height)
+
 
 def main():
   parser = argparse.ArgumentParser()
@@ -88,7 +122,7 @@ def main():
   if args.input:
     filename = args.input
   else:
-    print('No input file provided, using first mp3 found in current folder')
+    log("No input file provided, using first mp3 found in current folder")
     filename = './*.mp3'
   
   if args.output:
@@ -107,7 +141,7 @@ def main():
     step_width = 2000 / steps
 
   if args.rounded:
-    rounded = abs(int(args.rounded))
+    rounded = int(args.rounded)
   else:
     rounded = 0
 
@@ -131,12 +165,13 @@ def main():
     else:
       mode = "avg"
   
-  print('Loading audio file into RAM...')
-  print('Sampling at 48 kHz')
-  y, sr = librosa.load(filename, 48000, True)
-  print('Loaded and coverted audio to Mono track')
+  start = time.time()
 
-  delta_t = len(y) // steps
+  log("Loading audio file into RAM", sampling_rate="48000", mono=True)
+
+  y, sr = librosa.load(filename, 48000, True)
+
+  delta_t = len(y) // steps # delta is the ratio of desired steps (hence no. of bars) to the total sample count
   samples = create_buffer(y, delta_t, steps, mode=mode)
   draw(
     output_file=output, 
@@ -147,6 +182,10 @@ def main():
     gap=x_gap,
     rounded=rounded
   )
+
+  end = time.time()
+
+  log("Finished processing the audio file", src=filename, target=output, time_taken=f"{round(end - start)} seconds")
 
 if __name__ == '__main__':
     main()
