@@ -1,6 +1,12 @@
-FROM python:3.7.6-buster
+FROM python:3.7.6
 
-RUN apt-get update && apt-get install -y python3-dev libffi-dev cairo
+# RUN apt-get update && apt-get install -y python3-dev libffi-dev cairo
+
+ADD . .
+
+RUN apt-get update 
+
+RUN apt-get install -y libsndfile1-dev ffmpeg
 
 RUN pip install -r requirements.txt
 
