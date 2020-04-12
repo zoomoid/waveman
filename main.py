@@ -4,20 +4,23 @@ import argparse
 import cairosvg
 import time
 
+"""
+Small JSON logger using keyworded varargs
+
+@param msg logger status message
+@param **kwargs keyworded logger values
+"""
 def log(msg, **kwargs):
   log_obj = {}
   for key in kwargs:
     log_obj[key] = kwargs[key]
-  # log_obj['msg'] = msg
-  print(f"{msg}\t{log_obj}")
+  log_obj['msg'] = msg
+  print(f"{log_obj}")
 
 """
 Absolute maximum mode:
 
 For a given range, compute the absolute maximum sample
-NOTE: as we pass the original list of values to the function rather than copying
-only the relevant part, we rely on absolute range limits rather than refactoring this
-outside the function. This also means we cannot simply use max(list) or abs(list)
 @param y - sample array
 @param j - step index: means we compute for the j'th step
 @param delta - range length
@@ -86,7 +89,7 @@ def draw(output_file, samples, step_width, step_height, color='white', gap=1, ro
   log('Start drawing boxes', boxes=len(samples), color=color, rounded_radius=rounded)
   for i in range(0, len(samples)):
     dwg.add(dwg.rect(
-      (i * (step_width) + gap, (1 - samples[i]) * step_height), # position
+      (i * (step_width) + gap, -0.5 * samples[i] + (0.5 * step_height)), # position
       (step_width - 0.5*gap, samples[i] * step_height), # size
       rounded, rounded, # border radius (x, y)
       fill=color)
@@ -103,11 +106,13 @@ def draw(output_file, samples, step_width, step_height, color='white', gap=1, ro
     dpi=600,
     scale=1
   )
+  
   log("Converted SVG to PNG", output=output_file, width=((step_width + gap) * len(samples)), height=step_height)
 
 
 def main():
   parser = argparse.ArgumentParser()
+
   parser.add_argument('--input', help='Input file path')
   parser.add_argument('--steps', help='The total number of steps done')
   parser.add_argument('--width', help='The total width of the image')
@@ -122,8 +127,8 @@ def main():
   if args.input:
     filename = args.input
   else:
-    log("No input file provided, using first mp3 found in current folder")
-    filename = './*.mp3'
+    log("Missing input file")
+    return
   
   if args.output:
     output = args.output
