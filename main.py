@@ -9,7 +9,7 @@ def log(msg, **kwargs):
   for key in kwargs:
     log_obj[key] = kwargs[key]
   # log_obj['msg'] = msg
-  print(f"{msg} \n\t{log_obj}")
+  print(f"{msg}\t{log_obj}")
 
 """
 Absolute maximum mode:
@@ -150,7 +150,7 @@ def main():
   else:
     color = "black"
 
-  x_gap = 0.2 * step_width
+  x_gap = 0.25 * step_width
 
   if args.height:
     step_height = int(args.height)
@@ -169,7 +169,7 @@ def main():
 
   log("Loading audio file into RAM", sampling_rate="48000", mono=True)
 
-  y, sr = librosa.load(filename, 48000, True)
+  y, sr = librosa.load(filename, 48000, True, )
 
   delta_t = len(y) // steps # delta is the ratio of desired steps (hence no. of bars) to the total sample count
   samples = create_buffer(y, delta_t, steps, mode=mode)
