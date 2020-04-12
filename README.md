@@ -1,26 +1,37 @@
-# SpectraZoom
+# spectra-zoom
+
+![Demo waveform visualization](demo/demo.png "Demo waveform visualization")
 
 Generates visualizations of audio files like SoundCloud with some Python magic.
 
-Requires wave files for sampling.
-
 Requires ``cairo` as graphics backend if used in host mode.
+
 Otherwise just run the docker image and mount the audio file as volume.
 
-```
-usage: main.py [-h] [--input INPUT] [--steps STEPS] [--width WIDTH] [--height HEIGHT]
-               [-output OUTPUT]
+```bash
+usage: main.py [-h] [--input INPUT] [--steps STEPS] [--width WIDTH]
+               [--height HEIGHT] [--output OUTPUT] [--color COLOR]
+               [--rounded ROUNDED] [--mode MODE] [--align ALIGN]
 
 optional arguments:
-  -h, --help       show this help message and exit
-  -input INPUT     Input file path
-  --steps STEPS    The total number of steps done
-  --width WIDTH    The total width of the image
-  --height HEIGHT  The total height of the image
-  -output OUTPUT   Output file path
+  -h, --help         show this help message and exit
+  --input INPUT      Input file path. Required
+  --steps STEPS      The total number of steps done. [Default 200]
+  --width WIDTH      The total width of the image. [Default 2000]
+  --height HEIGHT    The total height of the image. [Default 128]
+  --output OUTPUT    Output file path. [Default $input]
+  --color COLOR      The fill color for the bars. [Default 'black']
+  --rounded ROUNDED  Rounded corner radius. [Default 0]
+  --mode MODE        Sample visualization mode. Either 'avg' or 'max' [Default
+                     'avg']
+  --align ALIGN      Vertical bar alignment. Either 'center' or 'bottom'
+                     [Default 'bottom']
 ```
 
-```
-python main.py --input '<audio file>' --width <WIDTH> --steps <STEPS> --height
-<HEIGHT> -output '<output svg>'
+## Docker Mode
+
+Build the Docker image from the provided Dockerfile and run it like this 
+```bash
+$ docker build -t spectra-zoom:2.0 .
+$ docker run -ti -v <Directory of audio file>:/spectra python3 main.py --input <Audio file> [ARGS...]
 ```
