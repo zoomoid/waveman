@@ -4,7 +4,7 @@
 
 Generates visualizations of audio files like SoundCloud with some Python magic.
 
-Requires ``cairo` as graphics backend if used in host mode.
+Requires `libsndfile` & `ffmpeg` to read audio format other than pure waves if used in host mode.
 
 Otherwise just run the docker image and mount the audio file as volume.
 
