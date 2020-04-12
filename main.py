@@ -4,6 +4,15 @@ import svgwrite
 import argparse
 import cairosvg
 
+"""
+Absolute maximum mode:
+
+For a given range, compute the absolute maximum sample
+@param y - sample array
+@param j - step index: means we compute for the j'th step
+@param delta - range length
+@return maximum absolute sample value
+"""
 def max_in_area(y, j, delta):
   max = 0
   for i in range(j * delta, (j + 1) * delta):
@@ -11,10 +20,31 @@ def max_in_area(y, j, delta):
       max = abs(y[i])
   return max
 
-def create_buffer(data, delta, steps):
+"""
+Average mode:
+
+For a given range, compute the average sample
+@param y - sample array
+@param j - step index: means we compute for the j'th step
+@param delta - range length
+@return average sample value
+"""
+def avg_in_area(y, j, delta):
+  acc = 0
+  for i in range(j * delta, (j+1) * delta):
+    acc += abs(y[i])
+  return acc / delta 
+
+
+def create_buffer(data, delta, steps, mode="avg"):
   samples = []
   for j in range(0, steps - 1):
-    samples.append(max_in_area(data, j, delta))
+    if mode is "avg":
+      samples.append(avg_in_area(data, j, delta))
+    elif mode is "max":
+      samples.append(max_in_area(data, j, delta))
+    else:
+      raise "Unsupported mode"
   print('Created sample buffer')
   return samples
 
@@ -51,6 +81,8 @@ def main():
   parser.add_argument('--output', help='Output file path')
   parser.add_argument('--color', help="The fill color for the bars")
   parser.add_argument('--rounded', help="Rounded corner radius")
+  parser.add_argument('--mode', help="Sample visualization mode. Either 'avg' or 'max' [Default 'avg']")
+
   args = parser.parse_args()
 
   if args.input:
@@ -90,6 +122,14 @@ def main():
     step_height = int(args.height)
   else:
     step_height = 128
+
+  if args.mode:
+    mode = "avg"
+  else:
+    if args.mode is "avg" or args.mode is "max":
+      mode = args.mode
+    else:
+      mode = "avg"
   
   print('Loading audio file into RAM...')
   print('Sampling at 48 kHz')
@@ -97,7 +137,7 @@ def main():
   print('Loaded and coverted audio to Mono track')
 
   delta_t = len(y) // steps
-  samples = create_buffer(y, delta_t, steps)
+  samples = create_buffer(y, delta_t, steps, mode=mode)
   draw(
     output_file=output, 
     samples=samples,
