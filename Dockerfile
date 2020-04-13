@@ -1,15 +1,15 @@
-FROM python:3.7.6
+FROM python:3.7.6-slim
 
 # RUN apt-get update && apt-get install -y python3-dev libffi-dev cairo
 
 WORKDIR /spectra
 
-ADD . .
+RUN apt-get update && apt-get install -y libsndfile1-dev ffmpeg
 
-RUN apt-get update 
+ADD requirements.txt .
 
-RUN apt-get install -y libsndfile1-dev ffmpeg
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install -r requirements.txt
+ADD main.py .
 
 CMD ["/bin/bash"]
