@@ -123,7 +123,8 @@ def main():
 
   parser.add_argument('--input', help='Input file path. Required')
   parser.add_argument('--steps', help='The total number of steps done. [Default 200]')
-  parser.add_argument('--width', help='The total width of the image. [Default 2000]')
+  parser.add_argument('--totalwidth', help='The total width of the image. [Default 2000]')
+  parser.add_argument('--stepwidth', help='Width of each step. Can derive the total width by providing --steps and --stepwidth. [Default 10]')
   parser.add_argument('--height', help='The total height of the image. [Default 128]')
   parser.add_argument('--output', help='Output file path. [Default $input]')
   parser.add_argument('--color', help="The fill color for the bars. [Default 'black']")
@@ -147,12 +148,15 @@ def main():
     steps = int(args.steps)
   else:
     steps = 200
-  
-  if args.width:
-    step_width = int(args.width) / steps
-  else:
-    step_width = 2000 / steps
 
+  if args.stepwidth:
+    step_width = int(args.stepwidth)
+  else:
+    if args.totalwidth:
+      step_width = int(args.totalwidth) / steps
+    else:
+      step_width = 2000 / steps
+  
   if args.rounded:
     rounded = int(args.rounded)
   else:
