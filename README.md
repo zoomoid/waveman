@@ -34,10 +34,10 @@ Build the Docker image from the provided Dockerfile and run it like this
 
 ```bash
 # Build the Docker image yourself OR
-$ docker build -t spectra-zoom:2.0 .
+$ docker build -t spectra-zoom:latest .
 
 # Pull the official image from the Github Docker Registry
-$ docker pull docker.pkg.github.com/occloxium/spectra-zoom/spectra-zoom:2.0
+$ docker pull docker.pkg.github.com/occloxium/spectra-zoom/spectra-zoom:latest
 
 # Run spectra-zoom inside the image
 $ docker run -ti -v <Directory of audio file>:/spectra python3 main.py --input <Audio file> [ARGS...]
