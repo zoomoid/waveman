@@ -196,7 +196,7 @@ def main():
 
   log("Loading audio file into RAM", sampling_rate="48000", mono=True)
 
-  y, sr = librosa.load(filename, 48000, True)
+  y, _ = librosa.load(filename, 48000, True)
 
   delta_t = len(y) // steps # delta is the ratio of desired steps (hence no. of bars) to the total sample count
   samples = create_buffer(y, delta_t, steps, mode=mode)
