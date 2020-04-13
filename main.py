@@ -119,18 +119,18 @@ def draw(output_file, samples, step_width, step_height, color="white", gap=1, ro
 
 
 def main():
-  parser = argparse.ArgumentParser()
+  parser = argparse.ArgumentParser(description="Creates cool-lookin' audio waveform visualisations to use as assets in players and videos.")
 
-  parser.add_argument('--input', help='Input file path. Required')
-  parser.add_argument('--steps', help='The total number of steps done. [Default 200]')
-  parser.add_argument('--totalwidth', help='The total width of the image. [Default 2000]')
-  parser.add_argument('--stepwidth', help='Width of each step. Can derive the total width by providing --steps and --stepwidth. [Default 10]')
-  parser.add_argument('--height', help='The total height of the image. [Default 128]')
-  parser.add_argument('--output', help='Output file path. [Default $input]')
-  parser.add_argument('--color', help="The fill color for the bars. [Default 'black']")
-  parser.add_argument('--rounded', help="Rounded corner radius. [Default 0]")
-  parser.add_argument('--mode', help="Sample visualization mode. Either 'avg' or 'max' [Default 'avg']")
-  parser.add_argument('--align', help="Vertical bar alignment. Either 'center' or 'bottom' [Default 'bottom']")
+  parser.add_argument('--input', help='Input file path. Required', required=True, type=str)
+  parser.add_argument('--steps', help='The total number of steps done. [Default 200]', default=200, type=int)
+  parser.add_argument('--totalwidth', help='The total width of the image. [Default 2000]', default=2000, type=int)
+  parser.add_argument('--stepwidth', help='Width of each step. Can derive the total width by providing --steps and --stepwidth. [Default 10]', default=10, type=float)
+  parser.add_argument('--height', help='The total height of the image. [Default 128]', default=128, type=int)
+  parser.add_argument('--output', help='Output file path. [Default $input]', type=str)
+  parser.add_argument('--color', help="The fill color for the bars. [Default 'black']", default="black", type=str)
+  parser.add_argument('--rounded', help="Rounded corner radius. [Default 0]", default=0, type=float)
+  parser.add_argument('--mode', help="Sample visualization mode. Either 'avg' or 'max' [Default 'avg']", default="avg", type=str, choices=["avg", "max"])
+  parser.add_argument('--align', help="Vertical bar alignment. Either 'center' or 'bottom' [Default 'bottom']", default="bottom", type=str, choices=["bottom", "center"])
   args = parser.parse_args()
 
   if args.input:
