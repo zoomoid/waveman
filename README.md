@@ -1,4 +1,4 @@
-# spectra-zoom
+# wave-man
 
 ![Demo waveform visualization](demo/demo.png "Demo waveform visualization")
 
@@ -43,11 +43,11 @@ Build the Docker image from the provided Dockerfile and run it like this
 
 ```bash
 # Build the Docker image yourself OR
-$ docker build -t spectra-zoom:latest .
+$ docker build -t wave-man:latest .
 
 # Pull the official image from the Github Docker Registry
-$ docker pull docker.pkg.github.com/occloxium/spectra-zoom/spectra-zoom:latest
+$ docker pull docker.pkg.github.com/occloxium/wave-man/wave-man:latest
 
-# Run spectra-zoom inside the image
-$ docker run -ti -v <Directory of audio file>:/spectra python3 main.py --input <Audio file> [ARGS...]
+# Run wave-man inside the image
+$ docker run -ti -v <Directory of audio file>:/wave python3 main.py --input <Audio file> [ARGS...]
 ```
