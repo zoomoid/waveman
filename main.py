@@ -3,52 +3,10 @@ import svgwrite
 import argparse
 import cairosvg
 import time
-
-"""
-Small JSON logger using keyworded varargs
-
-@param msg logger status message
-@param **kwargs keyworded logger values
-"""
-def log(msg, **kwargs):
-  log_obj = {}
-  for key in kwargs:
-    log_obj[key] = kwargs[key]
-  log_obj['msg'] = msg
-  print(f"{log_obj}")
-
-"""
-Absolute maximum mode:
-
-For a given range, compute the absolute maximum sample
-@param y - sample array
-@param j - step index: means we compute for the j'th step
-@param delta - range length
-@return maximum absolute sample value
-"""
-def max_in_area(y, j, delta):
-  return max([abs(y[i]) for i in range(j * delta, (j+1) * delta)])
-
-"""
-Average mode:
-
-For a given range, compute the average sample
-@param y - sample array
-@param j - step index: means we compute for the j'th step
-@param delta - range length
-@return average sample value
-"""
-def avg_in_area(y, j, delta):
-  return sum([abs(y[i]) for i in range(j * delta, (j+1) * delta)]) / delta 
-
-"""
-Normalizes a given list of numbers
-
-@param y - list of numbers
-"""
-def normalize(y):
-  max_val = max([abs(x) for x in y])
-  return list(map(lambda v: v / max_val, y))
+import base64
+from src.logger import log
+from src.wave import WaveMan
+from src.util import normalize, max_in_area, avg_in_area
 
 """
 Slices the full samples list into smaller chunks and processes them based on the given mode
@@ -83,6 +41,7 @@ Draws the transformed sample list to a SVG canvas based on the given arguments
 @param color fill color for the bars. [Defaults to "white"]
 @param gap spacing between the bars. [Defaults to 1]
 @param rounded radius of rounded borders. Draws only symmetric, i.e., same y-radius as x-radius. [Defaults to 0] 
+@param align baseline of alignment of boxes
 """
 def draw(output_file, samples, step_width, step_height, color="white", gap=1, rounded=0, align="bottom"):
   dwg = svgwrite.Drawing(output_file + ".svg")
@@ -96,12 +55,7 @@ def draw(output_file, samples, step_width, step_height, color="white", gap=1, ro
       log("Found unsupported alignment", align=align)
       return
     
-    dwg.add(dwg.rect(
-      pos, # position
-      (step_width - gap, samples[i] * step_height), # size
-      rounded, rounded, # border radius (x, y)
-      fill=color)
-    ) # assuming top-left corner to bottom-right growth
+    dwg.add(dwg.rect(pos, (step_width - gap, samples[i] * step_height), rounded, rounded, fill=color)) # assuming top-left corner to bottom-right growth
 
   dwg.save()
   log("Saved SVG to file", output=output_file, width=((step_width + gap) * len(samples)), height=step_height)
@@ -117,6 +71,11 @@ def draw(output_file, samples, step_width, step_height, color="white", gap=1, ro
   
   log("Converted SVG to PNG", output=output_file, width=((step_width + gap) * len(samples)), height=step_height)
 
+def encode_as_base64(filename):
+  with open(filename, "rb") as f:
+    data = f.read()
+    return base64.b64encode(data)
+    
 
 def main():
   parser = argparse.ArgumentParser(description="Creates cool-lookin' audio waveform visualisations to use as assets in players and videos.")
@@ -211,6 +170,9 @@ def main():
     align=align
   )
 
+  with open(f"{output}_base64.txt", "wb") as f:
+    f.write(encode_as_base64(f"{output}.png"))
+  
   end = time.time()
 
   log("Finished processing the audio file", src=filename, target=output, time_taken=f"{round(end - start)} seconds")
