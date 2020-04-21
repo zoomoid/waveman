@@ -8,3 +8,4 @@ pyvenv.cfg
 bin/
 share/
 **/__pycache__
+testupload.html

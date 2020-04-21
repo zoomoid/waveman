@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug import secure_filename
 import os
 
-folder = "~/Git/wave-man/uploaded"
+folder = "/home/hendrik/Git/wave-man/uploaded"
 extensions = set(['wav', 'mp3'])
 
 api = Blueprint('api', __name__)
@@ -30,16 +30,16 @@ def check_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in extensions
 
 
-@api.route('/image', methods=['POST'])
-def convert_image():
+@api.route('/', methods=['POST'])
+def convert_to_image():
     if request.method == 'POST':
         if 'soundfile' not in request.files:
             raise Error('No file was sent', status_code=400)
         file = request.files['soundfile']
-        if file.filename = '':
+        if file.filename == '':
             raise Error('File has no name', status_code=400) # some browsers do that, when no file was selected
         if check_file(file.filename):
             # save file, possibly omit that later
             filename = secure_filename(file.filename)
             file.save(os.path.join(folder, filename))
-            return 200
+            return "Upload successfull", 200
