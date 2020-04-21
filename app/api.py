@@ -34,9 +34,11 @@ def check_file(filename):
 def convert_to_image():
     if request.method == 'POST':
         if 'soundfile' not in request.files:
+            return {'message':'No file was sent'}, 400
             raise Error('No file was sent', status_code=400)
         file = request.files['soundfile']
         if file.filename == '':
+            return {'message':'File has no name'}, 400
             raise Error('File has no name', status_code=400) # some browsers do that, when no file was selected
         if check_file(file.filename):
             # save file, possibly omit that later
