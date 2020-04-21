@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from werkzeug import secure_filename
 import os
 
 folder = "~/Git/wave-man/uploaded"
@@ -37,3 +38,8 @@ def convert_image():
         file = request.files['soundfile']
         if file.filename = '':
             raise Error('File has no name', status_code=400) # some browsers do that, when no file was selected
+        if check_file(file.filename):
+            # save file, possibly omit that later
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(folder, filename))
+            return 200
