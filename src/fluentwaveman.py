@@ -80,6 +80,18 @@ class WaveMan:
       raise FluentError("Cannot call avg when already drawing")
 
   """
+  Generates rounded averaged chunks for the currently loaded samples based on the given number of steps
+  """
+  def rounded_avg(self):
+    if not self.drawing:
+      log("Chose chunk generation mode", mode="rounded_avg")
+      self.delta = len(self.samples) // self.steps
+      for j in range(0, self.steps):
+        self.chunks.append(round(avg_in_area(self.samples, j, self.delta), 2))
+    else:
+      raise FluentError("Cannot call avg when already drawing")
+
+  """
   Generates maximized chunks for the currently loaded samples based on the given number of steps
   """
   def max(self):
@@ -212,6 +224,10 @@ class WaveManOutput:
       return self
     else:
       raise FluentError("Called minify before svg was exported")
+
+  def to_string(self):
+    log("Requested SVG code for embedding")
+    return self.rawSVGData.tostring()
 
   """
   Writes a PNG to file
