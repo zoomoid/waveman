@@ -9,3 +9,4 @@ bin/
 share/
 **/__pycache__
 testupload.html
+samples/
