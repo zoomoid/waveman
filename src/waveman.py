@@ -11,7 +11,7 @@ from .util import normalize, max_in_area, avg_in_area
 class WaveMan():
   samples = []
   chunks = []
-  canvas = svgwrite.Drawing()
+
   def __init__(self, audiofile, config=None):
     self.audiofile = audiofile
     if config == None:
