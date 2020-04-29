@@ -43,7 +43,7 @@ Build the Docker image from the provided Dockerfile and run it like this
 
 ```bash
 # Build the Docker image yourself OR
-$ docker build -t wave-man:latest .
+$ docker build -t wave-man:latest src/
 
 # Pull the official image from the Github Docker Registry
 $ docker pull docker.pkg.github.com/occloxium/wave-man/wave-man:latest
@@ -51,3 +51,13 @@ $ docker pull docker.pkg.github.com/occloxium/wave-man/wave-man:latest
 # Run wave-man inside the image
 $ docker run -ti -v <Directory of audio file>:/wave python3 main.py --input <Audio file> [ARGS...]
 ```
+
+## HTTP Server
+
+Wave-Man is available as a standalone http backend that waits for an mp3 file to be submitted and returns SVG code
+according to the config.json file
+
+```
+HTTP/1.1 POST /wavify {"uri": "<URL TO YOUR MP3>"}
+```
+
