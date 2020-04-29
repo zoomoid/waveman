@@ -28,4 +28,4 @@ def post_wavify():
         return svg, 200
 
 if __name__ == '__main__':
-  app.run(debug=False, host='0.0.0.0') # We need to listen on gateway for docker to tunnel correctly
+  app.run(debug=True, host='0.0.0.0') # We need to listen on gateway for docker to tunnel correctly
