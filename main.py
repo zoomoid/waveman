@@ -22,14 +22,14 @@ def wavify(wave: WaveBody):
     response = fetch(wave.uri, timeout=20)
     print(response.status_code)
     if response.status_code == 200:
-        with open(f"{filename}.mp3", "wb") as f:
-            print(f"{filename}.mp3")
+        with open(f"/app/tmp/{filename}.mp3", "wb") as f:
+            print(f"/app/tmp/{filename}.mp3")
             f.write(response.content)
             f.close()
         # Generate SVG for sending back
-        svg = WaveMan(f"{filename}.mp3").to_string()
+        svg = WaveMan(f"/app/tmp/{filename}.mp3").to_string()
         # cleanup afterwards
-        os.unlink(f"{filename}.mp3") 
+        os.unlink(f"/app/tmp/{filename}.mp3") 
         return {"svg": svg}
     else:
         if response.status_code == 404:
