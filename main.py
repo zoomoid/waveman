@@ -1,31 +1,45 @@
-from flask import request, jsonify, Flask
-import requests
 import os
 import uuid
+from requests import get as fetch
+import fastapi
+from pydantic import BaseModel
 from src.waveman import WaveMan
 
-app = Flask(__name__)
+app = fastapi.FastAPI()
+
+class WaveBody(BaseModel):
+    uri: str
 
 """
 Expects a POST request with data 
 """
-@app.route('/wavify', methods=['POST'])
-def post_wavify():
-    if request.method == 'POST':
-        data = request.get_json()
-        print(data)
-        uri = data["uri"]
-        print(uri)
-        filename = str(uuid.uuid4())[0:8]
-        print(filename)
-        response = requests.get(uri, timeout=1)
-        print(response.status_code)
-        with  open(f"{filename}.mp3", "wb") as f:
+@app.post('/wavify')
+def wavify(wave: WaveBody):
+    print(wave.uri)
+    # Generate random temporary file name 
+    filename = str(uuid.uuid4())[0:8]
+    # Download audio file
+    response = fetch(wave.uri, timeout=1)
+    print(response.status_code)
+    if response.status_code == 200:
+        with open(f"{filename}.mp3", "wb") as f:
             f.write(response.content)
             f.close()
+        # Generate SVG for sending back
         svg = WaveMan(f"{filename}.mp3").to_string()
-        os.unlink(f"{filename}.mp3") # cleanup afterwards
-        return svg, 200
+        # cleanup afterwards
+        os.unlink(f"{filename}.mp3") 
+        return {"svg": svg}
+    else:
+        if response.status_code == 404:
+            raise fastapi.HTTPException(status_code=404, detail="Audio file could not be found")
+        else:
+            raise fastapi.HTTPException(status_code=response.status_code)
 
-if __name__ == '__main__':
-  app.run(debug=True, host='0.0.0.0') # We need to listen on gateway for docker to tunnel correctly
+@app.get('/healthz')
+def health():
+    return {"status": "ok"}
+
+@app.get('/')
+def root():
+    return {"status": "ok"}

@@ -6,14 +6,14 @@ RUN apt-get update && apt-get install -y libsndfile1-dev ffmpeg
 
 ADD requirements.txt .
 
+RUN pip3 install -r requirements.txt
+
 ADD src src
 
 ADD main.py .
 
+ADD cli .
+
 ADD config.json .
 
-RUN pip3 install -r src/requirements.txt
-
-RUN pip3 install -r requirements.txt
-
-CMD [ "python3", "main.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
