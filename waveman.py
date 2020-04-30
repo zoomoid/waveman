@@ -83,6 +83,9 @@ class WaveMan():
         return
       self.canvas.add(self.canvas.rect(pos, size, self.config['rounded'], self.config['rounded'], fill=self.config['color']))
 
+    log("Drawn bars onto canvas", "Chunks.length", len(self.chunks), "steps", self.config['steps'])
+    self.chunks = []
+    self.samples = []
     return self
 
   def to_string(self):
