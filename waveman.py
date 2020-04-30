@@ -21,7 +21,7 @@ class WaveMan():
       self.config = config
     self.config['width'] = self.config['steps'] * self.config['step_width']
     log("Initializing new drawing context", config=self.config)
-    self.canvas = svgwrite.Drawing(profile='tiny', viewBox=f"0 0 {self.config['height']} {self.config['width']}")
+    self.canvas = svgwrite.Drawing(profile='tiny', viewBox=f"0 0 {self.config['width']} {self.config['height']}", height=None, width=None)
     self.go()
 
   def go(self):
