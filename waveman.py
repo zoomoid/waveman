@@ -5,8 +5,8 @@ import uuid
 import librosa
 import json
 from io import BytesIO
-from .logger import log
-from .util import normalize, max_in_area, avg_in_area
+from logger import log
+from util import normalize, max_in_area, avg_in_area
 
 class WaveMan():
   samples = []

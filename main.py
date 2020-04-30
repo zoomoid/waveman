@@ -3,7 +3,7 @@ import uuid
 from requests import get as fetch
 import fastapi
 from pydantic import BaseModel
-from .waveman import WaveMan
+from waveman import WaveMan
 
 app = fastapi.FastAPI()
 
