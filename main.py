@@ -3,7 +3,7 @@ import uuid
 from requests import get as fetch
 import fastapi
 from pydantic import BaseModel
-from src.waveman import WaveMan
+from .waveman import WaveMan
 
 app = fastapi.FastAPI()
 
@@ -19,10 +19,11 @@ def wavify(wave: WaveBody):
     # Generate random temporary file name 
     filename = str(uuid.uuid4())[0:8]
     # Download audio file
-    response = fetch(wave.uri, timeout=1)
+    response = fetch(wave.uri, timeout=20)
     print(response.status_code)
     if response.status_code == 200:
         with open(f"{filename}.mp3", "wb") as f:
+            print(f"{filename}.mp3")
             f.write(response.content)
             f.close()
         # Generate SVG for sending back
