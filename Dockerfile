@@ -2,11 +2,11 @@ FROM python:3.7-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y libsndfile1-dev ffmpeg
+RUN apt-get update && apt-get install -y libsndfile1-dev ffmpeg libav-tools
 
 ADD requirements.txt .
 
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 ADD src src
 
@@ -16,4 +16,4 @@ ADD cli .
 
 ADD config.json .
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
