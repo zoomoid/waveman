@@ -27,7 +27,7 @@ def wavify(wave: WaveBody):
             f.write(response.content)
             f.close()
         # Generate SVG for sending back
-        waveman = WaveMan(f"/app/tmp/{filename}.mp3")
+        waveman = WaveMan(f"/app/tmp/{filename}.mp3").run()
         svg = waveman.to_string()
         waveman = None
         # cleanup afterwards

@@ -20,24 +20,27 @@ class WaveMan():
     else:
       self.config = config
     self.config['width'] = self.config['steps'] * self.config['step_width']
-    log("Initializing new drawing context", config=self.config)
+    log("Initializing new drawing context", config=self.config)  
+
+  def run(self):
     self.canvas = svgwrite.Drawing(
       profile='tiny', viewBox=f"0 0 {self.config['width']} {self.config['height']}",
       preserveAspectRatio="none"
     )
-    self.go()
+    return self.go(self)
 
   def go(self):
-    return self.load_audiofile()
+    return self.load_audiofile(self)
+
 
   def load_audiofile(self):
     samples, _ = librosa.load(self.audiofile, self.config['sr'], self.config['mono'])
     self.samples = samples
     log("Loaded audio file", sampling_rate=self.config['sr'], mono=self.config['mono'])
 
-    return self.map()
+    return self.transform(self)
 
-  def map(self):
+  def transform(self):
     # def normalize_samples(self):
     #   self.samples = normalize(self.samples)
     def normalize_chunks(self):
@@ -61,7 +64,7 @@ class WaveMan():
         rounded_avg(self, j)
 
     normalize_chunks(self)
-    return self.draw()
+    return self.draw(self)
 
   def draw(self):
     def bottom(self, i):
