@@ -33,8 +33,7 @@ class WaveMan():
     return self.transform()
 
   def transform(self):
-    # def normalize_samples(self):
-    #   self.samples = normalize(self.samples)
+    self.chunks = []
     def normalize_chunks(self):
       self.chunks = normalize(self.chunks)
     def avg(self, j):
