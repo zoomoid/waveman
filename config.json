@@ -1,9 +1,9 @@
 {
   "step_width": 20,
-  "height": 300,
+  "height": 150,
   "color": "#000000",
   "rounded": 10,
-  "steps": 64,
+  "steps": 96,
   "gap": 1,
   "mode": "rounded_avg",
   "align": "center",
