@@ -23,7 +23,7 @@ class WaveMan():
     log("Initializing new drawing context", config=self.config)
     self.canvas = svgwrite.Drawing(
       profile='tiny', viewBox=f"0 0 {self.config['width']} {self.config['height']}",
-      preserveAspectRatio="meet"
+      preserveAspectRatio="none"
     )
     self.go()
 
