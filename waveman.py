@@ -9,9 +9,6 @@ from logger import log
 from util import normalize, max_in_area, avg_in_area
 
 class WaveMan():
-  samples = []
-  chunks = []
-
   def __init__(self, audiofile, config=None):
     self.audiofile = audiofile
     if config == None:
@@ -33,7 +30,6 @@ class WaveMan():
     samples, _ = librosa.load(self.audiofile, self.config['sr'], self.config['mono'])
     self.samples = samples
     log("Loaded audio file", sampling_rate=self.config['sr'], mono=self.config['mono'])
-
     return self.transform()
 
   def transform(self):
@@ -60,6 +56,7 @@ class WaveMan():
         rounded_avg(self, j)
 
     normalize_chunks(self)
+    log("Tranformed samples into chunks", length=len(self.chunks), steps=self.config['steps'], mode=self.config['mode'])
     return self.draw()
 
   def draw(self):
