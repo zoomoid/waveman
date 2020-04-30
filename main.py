@@ -19,7 +19,7 @@ def wavify(wave: WaveBody):
     # Generate random temporary file name 
     filename = str(uuid.uuid4())[0:8]
     # Download audio file
-    response = fetch(wave.uri, timeout=20)
+    response = fetch(wave.uri, timeout=30)
     print(response.status_code)
     if response.status_code == 200:
         with open(f"/app/tmp/{filename}.mp3", "wb") as f:
