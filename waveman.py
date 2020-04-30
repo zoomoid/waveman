@@ -27,18 +27,14 @@ class WaveMan():
       profile='tiny', viewBox=f"0 0 {self.config['width']} {self.config['height']}",
       preserveAspectRatio="none"
     )
-    return self.go(self)
-
-  def go(self):
-    return self.load_audiofile(self)
-
+    return self.load_audiofile()
 
   def load_audiofile(self):
     samples, _ = librosa.load(self.audiofile, self.config['sr'], self.config['mono'])
     self.samples = samples
     log("Loaded audio file", sampling_rate=self.config['sr'], mono=self.config['mono'])
 
-    return self.transform(self)
+    return self.transform()
 
   def transform(self):
     # def normalize_samples(self):
@@ -64,7 +60,7 @@ class WaveMan():
         rounded_avg(self, j)
 
     normalize_chunks(self)
-    return self.draw(self)
+    return self.draw()
 
   def draw(self):
     def bottom(self, i):
