@@ -1,0 +1,14 @@
+{
+  "step_width": 20,
+  "height": 200,
+  "color": "#000000",
+  "rounded": 10,
+  "steps": 24,
+  "gap": 1,
+  "mode": "rounded_avg",
+  "align": "center",
+  "sr": 48000,
+  "mono": true,
+  "scale": 1,
+  "dpi": 600
+}
