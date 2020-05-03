@@ -40,14 +40,16 @@ def wavify(wave: WaveBody):
             raise fastapi.HTTPException(status_code=response.status_code)
 
 def gen_full_waveform(filename):
-    full_config = json.load('config/full.json')
+    with open("config/full.json", "r") as f:
+        full_config = json.load(f)
     waveman = WaveMan(f"/app/tmp/{filename}.mp3", config=full_config).run()
     svg = waveman.to_string()
     waveman = None
     return svg
 
 def gen_small_waveform(filename):
-    small_config = json.load('config/small.json')
+    with open("config/small.json", "r") as f:
+        small_config = json.load(f)
     waveman = WaveMan(f"/app/tmp/{filename}.mp3", config=small_config).run()
     svg = waveman.to_string()
     waveman = None
