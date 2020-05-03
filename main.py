@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 from requests import get as fetch
 import fastapi
 from pydantic import BaseModel
@@ -27,17 +28,30 @@ def wavify(wave: WaveBody):
             f.write(response.content)
             f.close()
         # Generate SVG for sending back
-        waveman = WaveMan(f"/app/tmp/{filename}.mp3").run()
-        svg = waveman.to_string()
-        waveman = None
+        small_waveform = gen_small_waveform(filename)
+        full_waveform = gen_full_waveform(filename)
         # cleanup afterwards
         os.unlink(f"/app/tmp/{filename}.mp3") 
-        return {"svg": svg}
+        return {"full": full_waveform, "small": small_waveform}
     else:
         if response.status_code == 404:
             raise fastapi.HTTPException(status_code=404, detail="Audio file could not be found")
         else:
             raise fastapi.HTTPException(status_code=response.status_code)
+
+def gen_full_waveform(filename):
+    full_config = json.load('config/full.json')
+    waveman = WaveMan(f"/app/tmp/{filename}.mp3", config=full_config).run()
+    svg = waveman.to_string()
+    waveman = None
+    return svg
+
+def gen_small_waveform(filename):
+    small_config = json.load('config/small.json')
+    waveman = WaveMan(f"/app/tmp/{filename}.mp3", config=small_config).run()
+    svg = waveman.to_string()
+    waveman = None
+    return svg
 
 @app.get('/healthz')
 def health():
