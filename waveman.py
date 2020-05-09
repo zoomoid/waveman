@@ -22,7 +22,7 @@ class WaveMan():
   def run(self):
     self.canvas = svgwrite.Drawing(
       profile='tiny', viewBox=f"0 0 {self.config['width']} {self.config['height']}",
-      preserveAspectRatio="none"
+      preserveAspectRatio=self.config["preserveAspectRatio"]
     )
     return self.load_audiofile()
 

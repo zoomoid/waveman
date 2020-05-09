@@ -1,8 +1,8 @@
 #!/bin/python3
 import argparse
 from os import path
-from src.logger import log as logger
-from src.waveman import WaveMan
+from logger import log as logger
+from waveman import WaveMan
 
 
 def main():
@@ -104,9 +104,10 @@ def main():
         "scale": 1,
         "mono": True,
         "dpi": 600,
+        "preserveAspectRatio": "meet",
     }
 
-    svg = WaveMan(filename, config).to_string()
+    svg = WaveMan(filename, config=config).run().to_string()
 
     with open(f"{output}.svg", "w") as f:
         f.write(svg)

@@ -1,14 +1,15 @@
 {
-  "step_width": 20,
+  "step_width": 10,
   "height": 200,
-  "color": "#000000",
+  "color": "#f58b44",
   "rounded": 10,
-  "steps": 24,
-  "gap": 1,
+  "steps": 48,
+  "gap": 3,
   "mode": "rounded_avg",
   "align": "center",
   "sr": 48000,
   "mono": true,
   "scale": 1,
-  "dpi": 600
+  "dpi": 600,
+  "preserveAspectRatio": "none" 
 }
