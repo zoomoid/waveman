@@ -7,8 +7,8 @@ For a given range, compute the absolute maximum sample
 @param delta - range length
 @return maximum absolute sample value
 """
-def max_in_area(y, j, delta):
-  return max([abs(y[i]) for i in range(j * delta, (j+1) * delta)])
+def max_in_area(y):
+  return max([abs(y[i]) for i in range(y)])
 
 """
 Average mode:
@@ -19,8 +19,8 @@ For a given range, compute the average sample
 @param delta - range length
 @return average sample value
 """
-def avg_in_area(y, j, delta):
-  return sum([abs(y[i]) for i in range(j * delta, (j+1) * delta)]) / delta 
+def avg_in_area(y):
+  return sum([abs(y[i]) for i in range(y)]) / len(y) 
 
 """
 Normalizes a given list of numbers

@@ -2,7 +2,7 @@
 import argparse
 from os import path
 from logger import log as logger
-from waveman import WaveMan
+from waveman import waveman, transcode_local, to_string, cleanup
 
 
 def main():
@@ -107,11 +107,15 @@ def main():
         "preserveAspectRatio": "meet",
     }
 
-    svg = WaveMan(filename, config=config).run().to_string()
+    fn = transcode_local(filename)
+    canvas = waveman(fn, config=config)
+    svg = canvas.to_string()
 
     with open(f"{output}.svg", "w") as f:
         f.write(svg)
         f.close()
+
+    cleanup(fn, clean_mp3=False)
 
 
 if __name__ == '__main__':

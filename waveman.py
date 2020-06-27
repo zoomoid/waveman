@@ -1,93 +1,114 @@
-import base64
 import cairosvg
 import svgwrite
+import soundfile
+import os
 import uuid
-import librosa
 import json
-from io import BytesIO
+import multiprocessing
 from logger import log
-from util import normalize, max_in_area, avg_in_area
 
-class WaveMan():
-  def __init__(self, audiofile, config=None):
-    self.audiofile = audiofile
-    if config == None:
-      with open("config.json", "r") as f:
-        self.config = json.load(f)
-    else:
-      self.config = config
-    self.config['width'] = self.config['steps'] * self.config['step_width']
-    log("Initializing new drawing context", config=self.config)  
+from urllib.request import urlopen
+from pydub import AudioSegment
 
-  def run(self):
-    self.canvas = svgwrite.Drawing(
-      profile='tiny', viewBox=f"0 0 {self.config['width']} {self.config['height']}",
-      preserveAspectRatio=self.config["preserveAspectRatio"]
-    )
-    return self.load_audiofile()
+config = {}
 
-  def load_audiofile(self):
-    samples, _ = librosa.load(self.audiofile, self.config['sr'], self.config['mono'])
-    self.samples = samples
-    log("Loaded audio file", sampling_rate=self.config['sr'], mono=self.config['mono'])
-    return self.transform()
+def waveman(fn, _config=None):
+  if _config == None:
+    with open("config.json", "r") as f:
+      config = json.load(f)
+  else:
+    config = _config
+  config['width'] = config['steps'] * config['step_width']
+  log("Initializing new drawing context", config=config)  
+  canvas = svgwrite.Drawing(profile='tiny', viewBox=f"0 0 {config['width']} {config['height']}",
+    preserveAspectRatio=config["preserveAspectRatio"])
 
-  def transform(self):
-    self.chunks = []
-    def normalize_chunks(self):
-      self.chunks = normalize(self.chunks)
-    def avg(self, j):
-      self.chunks.append(avg_in_area(self.samples, j, self.delta))
-    def rounded_avg(self, j):
-      digits = 2
-      self.chunks.append(round(avg_in_area(self.samples, j, self.delta), digits))
-    def max(self, j):
-      self.chunks.append(max_in_area(self.samples, j, self.delta))
-    
-    self.delta = len(self.samples) // self.config['steps']
-    log("Reducing sample array to chunks", mode=self.config['mode'])
-    for j in range(0, self.config['steps']):
-      if self.config['mode'] == "max":
-        max(self, j)
-      elif self.config['mode'] == "avg":
-        avg(self, j)
-      elif self.config['mode'] == "rounded_avg":
-        rounded_avg(self, j)
+  sf = soundfile.SoundFile(fn)
+  total_samples = len(sf)
+  block_length = int(total_samples // config['steps'])
+  f = open(fn, "rb")
+  block_iterator = soundfile.blocks(f, blocksize=block_length)
+  chunks = []
+  for i, block in enumerate(block_iterator):
+    mono_block = list(map(lambda sample: (sample[0] + sample[1]) / 2, block))
+    chunk = transformer(mono_block, config['mode'])
+    canvas.add(artist(canvas, chunk, i, config['step_width'], config['height'], config['gap'], config['align'], config['rounded'], config['color']))
+  
+  log("Tranformed samples into chunks")
+  log("Created SVG rectangles for all data chunks")
+  return canvas
 
-    normalize_chunks(self)
-    log("Tranformed samples into chunks", length=len(self.chunks), steps=self.config['steps'], mode=self.config['mode'])
-    return self.draw()
+def transformer(chunk, mode):
+  def normalize_chunk(_chunk):
+    print("here")
+    max_val = max([abs(s) for s in _chunk])
+    if max_val == 0:
+      raise ArithmeticError
+    return list(map(lambda v: v / max_val, _chunk))
+  def avg(_chunk):
+    return sum([abs(s) for s in _chunk]) / len(_chunk) 
+  def rounded_avg(_chunk):
+    return round(sum([abs(s) for s in _chunk]) / len(_chunk), 2)
+  def max(_chunk):
+    return max([abs(s) for s in _chunk])
 
-  def draw(self):
-    def bottom(self, i):
-      pos = (i * (self.config['step_width']),  (1 - self.chunks[i]) * self.config['height'])
-      size = (self.config['step_width']- self.config['gap'], self.chunks[i] * self.config['height'])
-      return pos, size
+  if mode == "max":
+    chunk = max(chunk)
+  elif mode == "avg":
+    chunk = avg(chunk)
+  elif mode == "rounded_avg":
+    chunk = rounded_avg(chunk)
+  else:
+    raise TypeError
 
-    def center(self, i):
-      pos =  (i * (self.config['step_width']), (0.5 * self.config['height']) - (0.5 * self.chunks[i] * self.config['height']))
-      size = (self.config['step_width'] - self.config['gap'], self.chunks[i] * self.config['height'])
-      return pos, size
+  return chunk
 
-    log("Drawing waveform", align=self.config['align'], radius=self.config['rounded'])
-    for i in range(0, len(self.chunks)):
-      if self.config['align'] == "bottom":
-        pos, size = bottom(self, i)
-      elif self.config['align'] == "center":
-        pos, size = center(self, i)
-      else:
-        return
-      self.canvas.add(self.canvas.rect(pos, size, self.config['rounded'], self.config['rounded'], fill=self.config['color']))
+def artist(canvas, chunk, i, width, height, gap, align, rounded, color):
+  def bottom(chunk, i):
+    pos = (i * (width),  (1 - chunk) * height)
+    size = (width - gap, chunk * height)
+    return pos, size
+  def center(chunk, i):
+    pos =  (i * (width), (0.5 * height) - (0.5 * chunk * height))
+    size = (width - gap, chunk * height)
+    return pos, size
+  if width == None or height == None or gap == None or align == None or rounded == None or color == None:
+    raise TypeError
+  log("Drawing chunk", i=i)
+  if align == "bottom":
+    pos, size = bottom(chunk, i)
+  elif align == "center":
+    pos, size = center(chunk, i)
+  else:
+    raise TypeError
+  return canvas.rect(pos, size, rounded, rounded, fill=color)
 
-    log("Drawn bars onto canvas", length=len(self.chunks), steps=self.config['steps'])
-    self.chunks = []
-    self.samples = []
-    return self
+def transcode(url, return_response=False):
+  output_fn = str(uuid.uuid4())[0:8]
+  with open(f"{output_fn}.mp3", 'wb') as f:
+    data = urlopen(url, timeout=1)
+    f.write(data.read())
+    f.close()
+  sound = AudioSegment.from_mp3(f"{output_fn}.mp3")
+  sound.export(f"{output_fn}.wav", format="wav")
+  if return_response:
+    return f"{output_fn}.wav", data
+  else:
+    return f"{output_fn}.wav"
 
-  def to_string(self):
-    return self.canvas.tostring()
+def transcode_local(fn):
+  output_fn = fn.replace(".mp3", "")
+  sound = AudioSegment.from_mp3(f"{output_fn}.mp3")
+  sound.export(f"{output_fn}.wav", format="wav")
+  return f"{output_fn}.wav"
 
-  def to_png(self):
-    return BytesIO(cairosvg.svg2png(bytestring=self.canvas.tostring().encode(), parent_width=self.config.width,
-      parent_height=self.config.height, dpi=self.config.dpi, scale=self.config.scale
-    ))
+def to_string(canvas):
+  return canvas.tostring()
+
+def cleanup(fn, clean_mp3=True, clean_wav=True):
+  name = fn.replace(".wav", "") # strip extension from filename
+  if clean_wav:
+    os.unlink(f"{name}.wav")
+  if clean_mp3:
+    os.unlink(f"{name}.mp3")
+  return True

@@ -10,5 +10,6 @@
   "sr": 48000,
   "mono": true,
   "scale": 1,
-  "dpi": 600
+  "dpi": 600,
+  "preserveAspectRatio": "none" 
 }
