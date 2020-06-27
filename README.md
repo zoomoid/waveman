@@ -30,7 +30,7 @@ optional arguments:
   --output OUTPUT       Output file path. [Default $input]
   --color COLOR         The fill color for the bars. [Default 'black']
   --rounded ROUNDED     Rounded corner radius. [Default 0]
-  --mode {avg,max}      Sample visualization mode. Either 'avg' or 'max'
+  --mode {avg,max,rounded_avg}      Sample visualization mode. Either 'avg', 'rounded_avg', or 'max'
                         [Default 'avg']
   --align {bottom,center}
                         Vertical bar alignment. Either 'center' or 'bottom'

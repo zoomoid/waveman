@@ -1,7 +1,6 @@
 import os
 import uuid
 import json
-from requests import get as fetch
 import fastapi
 # from pydantic import BaseModel
 from waveman import waveman, to_string, cleanup, transcode

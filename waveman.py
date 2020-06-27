@@ -1,10 +1,8 @@
-import cairosvg
 import svgwrite
 import soundfile
 import os
 import uuid
 import json
-import multiprocessing
 from logger import log
 
 from urllib.request import urlopen
