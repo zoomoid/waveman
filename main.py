@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 import fastapi
-# from pydantic import BaseModel
+from pydantic import BaseModel
 from waveman import waveman, to_string, cleanup, transcode
 
 app = fastapi.FastAPI()
