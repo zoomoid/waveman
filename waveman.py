@@ -101,7 +101,7 @@ def transcode_local(fn):
   return f"{output_fn}.wav"
 
 def to_string(canvas):
-  return canvas.tostring().replace("#abcdef", CONFIG['color'])
+  return canvas.tostring().replace("#abcdef", "{{.color}}")
 
 def cleanup(fn, clean_mp3=True, clean_wav=True):
   name = fn.replace(".wav", "") # strip extension from filename
