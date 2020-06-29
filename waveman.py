@@ -30,7 +30,7 @@ def waveman(fn, config=None):
   for i, block in enumerate(block_iterator):
     mono_block = list(map(lambda sample: (sample[0] + sample[1]) / 2, block))
     chunk = transformer(mono_block, CONFIG['mode'])
-    canvas.add(artist(canvas, chunk, i, CONFIG['step_width'], CONFIG['height'], CONFIG['gap'], CONFIG['align'], CONFIG['rounded'], CONFIG['color']))
+    canvas.add(artist(canvas, chunk, i, CONFIG['step_width'], CONFIG['height'], CONFIG['gap'], CONFIG['align'], CONFIG['rounded'], "#abcdef"))
   
   log("Tranformed samples into chunks")
   log("Created SVG rectangles for all data chunks")
@@ -101,7 +101,7 @@ def transcode_local(fn):
   return f"{output_fn}.wav"
 
 def to_string(canvas):
-  return canvas.tostring()
+  return canvas.tostring().replace("#abcdef", CONFIG['color'])
 
 def cleanup(fn, clean_mp3=True, clean_wav=True):
   name = fn.replace(".wav", "") # strip extension from filename
