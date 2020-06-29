@@ -17,7 +17,7 @@ Expects a POST request with data
 def wavify(wave: WaveBody):
   print(wave.uri)
   fn, response = transcode(wave.uri, return_response=True)
-  if response.status == 200:
+  if response.status_code == 200:
     # Generate SVG for sending back
     small_waveform = gen_small_waveform(fn)
     full_waveform = gen_full_waveform(fn)
@@ -25,7 +25,7 @@ def wavify(wave: WaveBody):
     cleanup(fn)
     return {"full": full_waveform, "small": small_waveform}
   else:
-    if response.status == 404:
+    if response.status_code == 404:
       raise fastapi.HTTPException(status_code=404, detail="Audio file could not be found")
     else:
       raise fastapi.HTTPException(status_code=response.status_code)
