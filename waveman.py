@@ -5,32 +5,32 @@ import uuid
 import json
 from logger import log
 
-from urllib.request import urlopen
+from requests import get
 from pydub import AudioSegment
 
-config = {}
+CONFIG = {}
 
-def waveman(fn, _config=None):
-  if _config == None:
+def waveman(fn, config=None):
+  if config == None:
     with open("config.json", "r") as f:
-      config = json.load(f)
+      CONFIG = json.load(f)
   else:
-    config = _config
-  config['width'] = config['steps'] * config['step_width']
-  log("Initializing new drawing context", config=config)  
-  canvas = svgwrite.Drawing(profile='tiny', viewBox=f"0 0 {config['width']} {config['height']}",
-    preserveAspectRatio=config["preserveAspectRatio"])
+    CONFIG = config
+  CONFIG['width'] = CONFIG['steps'] * CONFIG['step_width']
+  log("Initializing new drawing context", config=CONFIG)  
+  canvas = svgwrite.Drawing(profile='tiny', viewBox=f"0 0 {CONFIG['width']} {CONFIG['height']}",
+    preserveAspectRatio=CONFIG["preserveAspectRatio"])
 
   sf = soundfile.SoundFile(fn)
   total_samples = len(sf)
-  block_length = int(total_samples // config['steps'])
+  block_length = int(total_samples // CONFIG['steps'])
   f = open(fn, "rb")
   block_iterator = soundfile.blocks(f, blocksize=block_length)
   chunks = []
   for i, block in enumerate(block_iterator):
     mono_block = list(map(lambda sample: (sample[0] + sample[1]) / 2, block))
-    chunk = transformer(mono_block, config['mode'])
-    canvas.add(artist(canvas, chunk, i, config['step_width'], config['height'], config['gap'], config['align'], config['rounded'], config['color']))
+    chunk = transformer(mono_block, CONFIG['mode'])
+    canvas.add(artist(canvas, chunk, i, CONFIG['step_width'], CONFIG['height'], CONFIG['gap'], CONFIG['align'], CONFIG['rounded'], CONFIG['color']))
   
   log("Tranformed samples into chunks")
   log("Created SVG rectangles for all data chunks")
@@ -84,13 +84,13 @@ def artist(canvas, chunk, i, width, height, gap, align, rounded, color):
 def transcode(url, return_response=False):
   output_fn = str(uuid.uuid4())[0:8]
   with open(f"{output_fn}.mp3", 'wb') as f:
-    data = urlopen(url, timeout=1)
-    f.write(data.read())
+    r = get(url, timeout=1)
+    f.write(r.content)
     f.close()
   sound = AudioSegment.from_mp3(f"{output_fn}.mp3")
   sound.export(f"{output_fn}.wav", format="wav")
   if return_response:
-    return f"{output_fn}.wav", data
+    return f"{output_fn}.wav", r
   else:
     return f"{output_fn}.wav"
 

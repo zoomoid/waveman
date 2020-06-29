@@ -1,9 +1,14 @@
+certifi==2020.6.20
 cffi==1.14.0
+chardet==3.0.4
 fastapi==0.58.0
+idna==2.10
 numpy==1.19.0
 pycparser==2.20
 pydantic==1.5.1
 pydub==0.24.1
+requests==2.24.0
 SoundFile==0.10.3.post1
 starlette==0.13.4
 svgwrite==1.4
+urllib3==1.25.9
