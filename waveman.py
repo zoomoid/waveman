@@ -48,7 +48,6 @@ def normalize(chunk):
   return list(map(lambda v: v / max_val, chunk))
 
 def transformer(chunk, mode):
-  
   def avg(_chunk):
     return sum([abs(s) for s in _chunk]) / len(_chunk) 
   def rounded_avg(_chunk):
@@ -64,7 +63,6 @@ def transformer(chunk, mode):
     chunk = rounded_avg(chunk)
   else:
     raise TypeError
-
   return chunk
 
 def artist(canvas, chunk, i, width, height, gap, align, rounded, color):
@@ -90,7 +88,7 @@ def artist(canvas, chunk, i, width, height, gap, align, rounded, color):
 def transcode(url, return_response=False):
   output_fn = str(uuid.uuid4())[0:8]
   with open(f"{output_fn}.mp3", 'wb') as f:
-    r = get(url, timeout=1)
+    r = get(url, timeout=10)
     f.write(r.content)
     f.close()
   sound = AudioSegment.from_mp3(f"{output_fn}.mp3")
