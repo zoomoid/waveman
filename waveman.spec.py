@@ -4,7 +4,8 @@ def main():
   fn = transcode("https://files.zoomoid.de/artemis/Hale-Bopp.mp3")
   # print(output)
   canvas = waveman(fn)
-  print(to_string(canvas))
+  f = open("demo.svg", "w+")
+  f.write(to_string(canvas))
   cleanup(fn)
   
 
