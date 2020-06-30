@@ -18,8 +18,7 @@ def waveman(fn, config=None):
     CONFIG = config
   CONFIG['width'] = CONFIG['steps'] * CONFIG['step_width']
   log("Initializing new drawing context", config=CONFIG)  
-  canvas = svgwrite.Drawing(profile='tiny', viewBox=f"0 0 {CONFIG['width']} {CONFIG['height']}",
-    preserveAspectRatio=CONFIG["preserveAspectRatio"])
+  canvas = svgwrite.Drawing(profile='tiny', viewBox=f"0 0 {CONFIG['width']} {CONFIG['height']}", preserveAspectRatio=CONFIG["preserveAspectRatio"])
 
   sf = soundfile.SoundFile(fn)
   total_samples = len(sf)
@@ -29,13 +28,16 @@ def waveman(fn, config=None):
   chunks = []
   for i, block in enumerate(block_iterator):
     mono_block = list(map(lambda sample: (sample[0] + sample[1]) / 2, block))
-    chunks += transformer(mono_block, CONFIG['mode'])
-
+    chunks.append(transformer(mono_block, CONFIG['mode']))
+    log("Reduced frame to sample", i=i)
+  
   chunks = normalize(chunks)
+  log("Tranformed frames into chunks")
+
   for i, chunk in enumerate(chunks):
     canvas.add(artist(canvas, chunk, i, CONFIG['step_width'], CONFIG['height'], CONFIG['gap'], CONFIG['align'], CONFIG['rounded'], "#abcdef"))
   
-  log("Tranformed samples into chunks")
+
   log("Created SVG rectangles for all data chunks")
   return canvas
 
