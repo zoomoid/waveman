@@ -59,7 +59,7 @@ def transformer(chunk, mode):
   else:
     raise TypeError
 
-  return chunk
+  return normalize_chunk(chunk)
 
 def artist(canvas, chunk, i, width, height, gap, align, rounded, color):
   def bottom(chunk, i):
