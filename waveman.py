@@ -29,20 +29,24 @@ def waveman(fn, config=None):
   chunks = []
   for i, block in enumerate(block_iterator):
     mono_block = list(map(lambda sample: (sample[0] + sample[1]) / 2, block))
-    chunk = transformer(mono_block, CONFIG['mode'])
+    chunks += transformer(mono_block, CONFIG['mode'])
+
+  chunks = normalize(chunks)
+  for i, chunk in enumerate(chunks):
     canvas.add(artist(canvas, chunk, i, CONFIG['step_width'], CONFIG['height'], CONFIG['gap'], CONFIG['align'], CONFIG['rounded'], "#abcdef"))
   
   log("Tranformed samples into chunks")
   log("Created SVG rectangles for all data chunks")
   return canvas
 
+def normalize(chunk):
+  max_val = max([abs(s) for s in chunk])
+  if max_val == 0:
+    raise ArithmeticError
+  return list(map(lambda v: v / max_val, chunk))
+
 def transformer(chunk, mode):
-  def normalize_chunk(_chunk):
-    print("here")
-    max_val = max([abs(s) for s in _chunk])
-    if max_val == 0:
-      raise ArithmeticError
-    return list(map(lambda v: v / max_val, _chunk))
+  
   def avg(_chunk):
     return sum([abs(s) for s in _chunk]) / len(_chunk) 
   def rounded_avg(_chunk):
@@ -59,7 +63,7 @@ def transformer(chunk, mode):
   else:
     raise TypeError
 
-  return normalize_chunk(chunk)
+  return chunk
 
 def artist(canvas, chunk, i, width, height, gap, align, rounded, color):
   def bottom(chunk, i):
