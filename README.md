@@ -4,7 +4,7 @@
 
 Generates visualizations of audio files like SoundCloud with some Python magic.
 
-Requires `libsndfile` & `ffmpeg` to read audio format other than pure waves if used in host mode.
+Requires `libsndfile` & `ffmpeg` to read audio formats other than pure waves if used in host mode.
 
 Otherwise just run the docker image and mount the audio file as volume.
 
@@ -49,13 +49,15 @@ $ docker build -t wave-man:latest src/
 $ docker pull docker.pkg.github.com/occloxium/wave-man/wave-man:latest
 
 # Run wave-man inside the image
-$ docker run -ti -v <Directory of audio file>:/wave python3 main.py --input <Audio file> [ARGS...]
+$ docker run -ti -v <Directory of audio file>:/app/files python3 main.py --input <Audio file> [ARGS...]
 ```
 
 ## HTTP Server
 
-Wave-Man is available as a standalone http backend that waits for an mp3 file to be submitted and returns SVG code
-according to the config.json file
+Wave-Man is available as a standalone http backend that waits for an mp3 file to be submitted and returns SVG code according to the config.json file
+
+Note that the URI has to be local, i.e., come from for example a mounted volume when running as a 
+container or a valid filename for any mp3 located in ./files.
 
 ```
 HTTP/1.1 POST /wavify {"uri": "<URL TO YOUR MP3>"}
