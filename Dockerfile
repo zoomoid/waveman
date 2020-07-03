@@ -12,6 +12,4 @@ RUN pip --no-cache-dir install -r requirements.txt
 
 ADD . .
 
-RUN mkdir files
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]

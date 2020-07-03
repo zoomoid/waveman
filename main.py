@@ -15,20 +15,11 @@ Expects a POST request with data
 """
 @app.post('/wavify')
 def wavify(wave: WaveBody):
-  print(wave.uri)
-  fn, response = transcode(wave.uri, return_response=True)
-  if response.status_code == 200:
-    # Generate SVG for sending back
-    small_waveform = gen_waveform(fn, "config/small.json")
-    full_waveform = gen_waveform(fn, "config/full.json")
-    # cleanup afterwards
-    cleanup(fn)
-    return {"full": full_waveform, "small": small_waveform}
-  else:
-    if response.status_code == 404:
-      raise fastapi.HTTPException(status_code=404, detail="Audio file could not be found")
-    else:
-      raise fastapi.HTTPException(status_code=response.status_code)
+  fn = transcode(wave.uri)
+  small_waveform = gen_waveform(fn, "config/small.json")
+  full_waveform = gen_waveform(fn, "config/full.json")
+  # cleanup afterwards
+  cleanup(fn)
 
 def gen_waveform(filename, config_fn):
   with open(config_fn, "r") as f:

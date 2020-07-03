@@ -1,6 +1,6 @@
 /.vscode
-*.mp3
-*.wav
+**.mp3
+**.wav
 scripts/
 lib/
 lib64
