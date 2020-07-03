@@ -20,6 +20,10 @@ def wavify(wave: WaveBody):
   full_waveform = gen_waveform(fn, "config/full.json")
   # cleanup afterwards
   cleanup(fn)
+  return {
+    "full": full_waveform,
+    "small": small_waveform,
+  }
 
 def gen_waveform(filename, config_fn):
   with open(config_fn, "r") as f:
