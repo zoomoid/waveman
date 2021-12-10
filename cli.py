@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import argparse
 from os import path
-from logger import log as logger
+from logger import Logger
 from waveman import waveman, transcode, to_string, cleanup
 import timeit
 
@@ -12,7 +12,7 @@ def main():
     parser.add_argument(
         '--input', help='Input file path. Required', required=True, type=str)
     parser.add_argument(
-        '--steps', help='The total number of steps done. [Default 64]', default=32, type=int)
+        '--steps', help='The total number of steps done. [Default 64]', default=64, type=int)
     parser.add_argument(
         '--stepwidth', help='Width of each step. Can derive the total width by providing --steps and --stepwidth. [Default 45]', default=20, type=float)
     parser.add_argument(
@@ -32,7 +32,7 @@ def main():
     if args.input:
         filename = args.input
     else:
-        logger("Missing input file")
+        Logger.error("Missing input file")
         return
     if args.output:
         output = args.output
@@ -53,13 +53,13 @@ def main():
         if args.mode == "avg" or args.mode == "max" or args.mode == "rounded_avg":
             mode = args.mode
         else:
-            logger("Found unsupported transformation mode. Only supports 'avg', 'rounded_avg' and 'max'", mode=args.mode)
+            Logger.warn("Found unsupported transformation mode. Only supports 'avg', 'rounded_avg' and 'max'", mode=args.mode)
             mode = "avg"
     if args.align:
         if args.align == "bottom" or args.align == "center":
             align = args.align
         else:
-            logger("Found unsupported alignment. Only supports 'center' and 'bottom'", align=args.align)
+            Logger.warn("Found unsupported alignment. Only supports 'center' and 'bottom'", align=args.align)
             align = "center"
 
     config = {
