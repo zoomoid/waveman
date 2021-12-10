@@ -1,3 +1,5 @@
+import json
+
 """
 AbstractConfig contains the general config settings that both, full and small share
 """
