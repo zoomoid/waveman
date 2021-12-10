@@ -1,5 +1,4 @@
-from logger import Logger
-from functools import reduce
+import logging
 
 class Transformer:
   def __init__(self, f, block_length, steps, chunk_window=4096, interpolation=16, mode="avg", mono=True):
