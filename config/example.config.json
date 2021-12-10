@@ -1,0 +1,26 @@
+{
+  "shared": {
+    "color": "#000000",
+    "mode": "rounded_avg",
+    "align": "center",
+    "sr": 48000,
+    "mono": true,
+    "scale": 1,
+    "dpi": 600,
+    "preserveAspectRatio": "none"
+  },
+  "large": {
+    "step_width": 20,
+    "height": 200,
+    "rounded": 10,
+    "steps": 64,
+    "gap": 10
+  },
+  "small": {
+    "step_width": 10,
+    "height": 200,
+    "rounded": 10,
+    "steps": 32,
+    "gap": 5
+  }
+}
