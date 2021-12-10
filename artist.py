@@ -1,4 +1,26 @@
 from config import Full, Small
+from logger import Logger
+class Position:
+  def __init__(self, x, y):
+    self._x = x
+    self._y = y
+  @property
+  def x(self):
+    return self._x
+  @property 
+  def y(self):
+    return self._y
+
+class Size:
+  def __init__(self, w, h):
+    self._w = w
+    self._h = h
+  @property
+  def w(self):
+    return self._w
+  @property
+  def h(self):
+    return self._h
 
 """
 Artist is a class that allows us to override the drawing logic more easily and by just specifying a new draw function
@@ -6,7 +28,7 @@ to any child class, as well as overriding the svg XML tag template with custom s
 without having to change the entire structure of draw code.
 """
 class Artist:
-  def __init__(self, sample_list, config)
+  def __init__(self, sample_list, config):
     self.sample_list = sample_list
     self.align = config.align
     self.config = config
