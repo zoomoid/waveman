@@ -1,13 +1,15 @@
 from waveman import waveman, transcode, to_string, cleanup
+import timeit
+
 
 def main():
-  fn = transcode("https://files.zoomoid.de/artemis/Hale-Bopp.mp3")
+  fn = transcode('Mars.mp3')
   # print(output)
   canvas = waveman(fn)
-  f = open("demo.svg", "w+")
+  f = open("mars.svg", "w+")
   f.write(to_string(canvas))
   cleanup(fn)
   
 
 if __name__ == "__main__":
-  main()
+  timeit.timeit('main()', number=1)
