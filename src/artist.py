@@ -1,5 +1,5 @@
 import logging
-from config import AbstractConfiguration
+from .config import AbstractConfiguration
 
 
 class Position:
@@ -30,9 +30,9 @@ class Size:
         return self._h
 
 
-class Artist:
+class WavePainter:
     """
-    Artist is a class that allows us to override the drawing logic more easily and by just specifying a new draw function
+    WavePainter is a class that allows us to override the drawing logic more easily and by just specifying a new draw function
     to any child class, as well as overriding the svg XML tag template with custom strings,
     without having to change the entire structure of draw code.
     """
@@ -47,13 +47,13 @@ class Artist:
 
     def template(self):
         """
-        The default artist's svg template which rounds up the creation of drawing
+        The default painter's svg template which rounds up the creation of drawing
         """
         return f'<svg baseProfile="tiny" height="100%" preserveAspectRatio="{self.config.preserve_aspect_ratio}" version="1.2" viewBox="0 0 {self.width} {self.height}" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink"><defs/>{self.elements}</svg>'
 
     def draw(self):
         """
-        The default artist's draw function. Creates a simple bar waveform, nothing too complicated
+        The default painter's draw function. Creates a simple bar waveform, nothing too complicated
         """
 
         def bottom(sample: float, i: int, c: AbstractConfiguration):
