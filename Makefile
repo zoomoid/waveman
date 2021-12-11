@@ -1,5 +1,5 @@
 VERSION := $(shell git describe | sed -e 's/^v//')
-GH_REG_PREFIX := docker.pkg.github.com/occloxium/wave-man
+GH_REG_PREFIX := ghcr.io/zoomoid/wave-man
 
 all: build tag push
 
