@@ -97,10 +97,7 @@ def main():
 
     wm = Waveman(audio_file=filename, config_manager=config_manager)
 
-    with open(f"{output}.svg", "w") as f:
-        f.write(canvas)
-        f.close()
-
+    wm.transcode().transform_all().draw_all().cleanup()
 
 if __name__ == "__main__":
     timeit.timeit(lambda: main(), number=1)
