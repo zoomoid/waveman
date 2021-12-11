@@ -1,4 +1,4 @@
-FROM tiangolo/uvicorn-gunicorn:python3.8-slim
+FROM python:3.10-bullseye
 
 WORKDIR /app
 
@@ -11,5 +11,3 @@ ADD requirements.txt .
 RUN pip --no-cache-dir install -r requirements.txt
 
 ADD . .
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
